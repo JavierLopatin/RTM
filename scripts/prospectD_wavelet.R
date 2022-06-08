@@ -182,7 +182,7 @@ for (i in 1:nrow(spectra)){
 }
 
 colnames(estimates_traits) = c("N", "Cab", "Car", "Anth", "CW", "Cm", "Cbrown")
-rownames(estimates_traits) =rownames(spectra)
+rownames(estimates_traits) = rownames(spectra)
 
 ################################################
 #: export results
