@@ -98,7 +98,12 @@ for (kk in 1:length(parameters)){
 }
 colnames(LUT) = c("N", "Cab", "Car", "Anth", "Cw", "Cm", "brown")
 
-#couple values
+# Couple values of LMA and EWT to enhace LMA retrivals; only under well watered conditions
+# Weiss, M., Baret, F., Myneni, R., Pragnere, A. & Knyazikhin, Y. 2000. Investigation of a model inversion technique to estimate
+#        canopy biophysical variables from spectral and direc- tional reflectance data.Agronomie 20: 3–22.
+# Combal, B., Baret, F., Weiss, M., Trubuil, A., Mace, D., Pragnere, A., Mynenic, R., Knyazikhin, Y. & Wang, L. 2003.
+#        Retrieval of canopy biophysical variables from bidirectional reflectance: using prior information to solve the ill-posed inverse problem.
+#        Remote Sensing of Environment 84: 1–15.
 for (i in 1:nrow(LUT)){
   LUT[i,6] = LUT[i,5]/sample(seq(2.5,5,length.out=1000), 1, replace=TRUE)
 }
