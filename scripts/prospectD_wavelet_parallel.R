@@ -11,7 +11,6 @@
 
 
 # load libraries
-
 require(wmtsa)
 require(foreach)
 require(doParallel)
@@ -38,7 +37,7 @@ setwd("~/Documentos/GitHub/RTM")
 # load functions
 source("scripts/PROSPECT_D/main.r")
 
-
+# get measured spectra
 spectra = as.matrix(read.csv("data/FAB2016_smoothed.csv", sep=",", header=TRUE))
 head(spectra)
 #minband = min(as.numeric(substr(colnames(spectra), 2,5)))
@@ -47,7 +46,7 @@ maxband = max(as.numeric(substr(colnames(spectra), 2,5)), na.rm=TRUE)
 spectra = spectra[,(minband-400+9):ncol(spectra)]
 head(spectra)
 
-#test
+#test wavelet transform
 wavelet_spectra = as.matrix(wmtsa::wavCWT(x=as.numeric(spectra[21,]), n.scale=wavelet_no, scale.range=wavelet_range))
 par(mfrow=c(2,3))
 plot(wavelet_spectra[,1], type="l")
@@ -129,7 +128,7 @@ if(wavelet_yesno==1){
   wavelet_LUT6 = matrix(NA, nrow=nrow(LUT_spectra), ncol=ncol(LUT_spectra))
 
   for (i in 1:nrow(LUT_spectra)){
-    wavelet_LUT = as.matrix(wavCWT(x=as.numeric(LUT_spectra[i,]), n.scale=wavelet_no, scale.range=wavelet_range))
+    wavelet_LUT = as.matrix(wmtsa::wavCWT(x=as.numeric(LUT_spectra[i,]), n.scale=wavelet_no, scale.range=wavelet_range))
     wavelet_LUT3[i,] = wavelet_LUT[,3]
     wavelet_LUT4[i,] = wavelet_LUT[,4]
     wavelet_LUT5[i,] = wavelet_LUT[,5]
@@ -181,13 +180,13 @@ results_all <- foreach(i = 1:nrow(spectra)) %dopar% {
   estimates_traits = colSums(apply(LUT[LUTcost_matselect,], MARGIN=2, function(x) x*weight))
   estimates_sd = apply(LUT[LUTcost_matselect,], 2, sd)
   estimates_spectra = colSums(LUT_spectra[LUTcost_matselect,]*weight)
-  estimates_meanRMSE = sqrt((mean(as.numeric(spectra[i,]) - estimates_spectra)^2))#estimates_spectra[i,]
+  estimates_meanRMSE = sqrt((mean(as.numeric(spectra[i,]) - estimates_spectra[i,])^2))#estimates_spectra[i,]
 
-  png(file = paste("inverted_spectra/inversion_PD_",i,".png",sep=""),width = 400,units="px", height = 400, res = 80,bg = "white")
-  plot(minband:maxband,as.numeric(spectra[i,]), xlab="wavelength [nm]", ylab="reflectance [%]", col="red", type="l", ylim=c(0,1), main=paste("pot: ",rownames(spectra)[i],"  RMSE: ",round(estimates_meanRMSE[i],3), sep=""))
-  lines(minband:maxband, estimates_spectra, col="black")#estimates_spectra[i,]
-  grid()
-  dev.off()
+  # png(file = paste("inverted_spectra/inversion_PD_",i,".png",sep=""),width = 400,units="px", height = 400, res = 80,bg = "white")
+  # plot(minband:maxband,as.numeric(spectra[i,]), xlab="wavelength [nm]", ylab="reflectance [%]", col="red", type="l", ylim=c(0,1), main=paste("pot: ",rownames(spectra)[i],"  RMSE: ",round(estimates_meanRMSE[i],3), sep=""))
+  # lines(minband:maxband, estimates_spectra, col="black")#estimates_spectra[i,]
+  # grid()
+  # dev.off()
 
   results_run[[1]] = estimates_traits
   results_run[[2]] = estimates_sd

@@ -44,7 +44,7 @@ maxband = max(as.numeric(substr(colnames(spectra), 2,5)), na.rm=TRUE)
 spectra = spectra[,(minband-400+9):ncol(spectra)]
 
 
-#test
+#test wavelet transform
 wavelet_spectra = as.matrix(wmtsa::wavCWT(x=as.numeric(spectra[21,]), n.scale=wavelet_no, scale.range=wavelet_range))
 par(mfrow=c(2,3))
 plot(wavelet_spectra[,1], type="l")
@@ -100,7 +100,7 @@ colnames(LUT) = c("N", "Cab", "Car", "Anth", "Cw", "Cm", "brown")
 
 # Couple values of LMA and EWT to enhace LMA retrivals; only under well watered conditions
 # Weiss, M., Baret, F., Myneni, R., Pragnere, A. & Knyazikhin, Y. 2000. Investigation of a model inversion technique to estimate
-#        canopy biophysical variables from spectral and direc- tional reflectance data.Agronomie 20: 3–22.
+#        canopy biophysical variables from spectral and directional reflectance data. Agronomie 20: 3–22.
 # Combal, B., Baret, F., Weiss, M., Trubuil, A., Mace, D., Pragnere, A., Mynenic, R., Knyazikhin, Y. & Wang, L. 2003.
 #        Retrieval of canopy biophysical variables from bidirectional reflectance: using prior information to solve the ill-posed inverse problem.
 #        Remote Sensing of Environment 84: 1–15.
@@ -177,13 +177,13 @@ for (i in 1:nrow(spectra)){
   estimates_spectra[i,] = colSums(LUT_spectra[LUTcost_matselect,]*weight)
   estimates_meanRMSE[i] = sqrt((mean(as.numeric(spectra[i,]) - estimates_spectra[i,])^2))
 
-  png(file = paste("inverted_spectra/inversion_PD_",i,".png",sep=""),width = 400,units="px", height = 400, res = 80,bg = "white")
-  plot(minband:maxband,as.numeric(spectra[i,]), xlab="wavelength [nm]", ylab="reflectance [%]", col="red", type="l", ylim=c(0,1), main=paste("pot: ",rownames(spectra)[i],"  RMSE: ",round(estimates_meanRMSE[i],3), sep=""))
-  lines(minband:maxband,estimates_spectra[i,], col="black")
-  grid()
-  dev.off()
-  print(paste("inversion of spectra", i, "of", nrow(spectra)))
-  flush.console()
+  # png(file = paste("inverted_spectra/inversion_PD_",i,".png",sep=""),width = 400,units="px", height = 400, res = 80,bg = "white")
+  # plot(minband:maxband,as.numeric(spectra[i,]), xlab="wavelength [nm]", ylab="reflectance [%]", col="red", type="l", ylim=c(0,1), main=paste("pot: ",rownames(spectra)[i],"  RMSE: ",round(estimates_meanRMSE[i],3), sep=""))
+  # lines(minband:maxband,estimates_spectra[i,], col="black")
+  # grid()
+  # dev.off()
+  # print(paste("inversion of spectra", i, "of", nrow(spectra)))
+  # flush.console()
 }
 
 colnames(estimates_traits) = c("N", "Cab", "Car", "Anth", "CW", "Cm", "Cbrown")
