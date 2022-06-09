@@ -81,7 +81,8 @@ getProsailLUT = function(parameters, LUTsize, wavelet_yesno=1, wavelet_no = 6, w
 
     close(pb) # close progress bar conection
 
-    out = list(wavelet_LUT3, wavelet_LUT4, wavelet_LUT5, wavelet_LUT6)
+    out = list(LUT=LUT, LUT_spectra=LUT_spectra, wavelet_LUT3=wavelet_LUT3, wavelet_LUT4=wavelet_LUT4,
+               wavelet_LUT5=wavelet_LUT5, wavelet_LUT6=wavelet_LUT6)
     return(out)
 }
 
@@ -89,16 +90,19 @@ getProsailLUT = function(parameters, LUTsize, wavelet_yesno=1, wavelet_no = 6, w
 ########################################################
 # Function to invert PROSPECT-D with wavelets
 ########################################################
-invertProsail = function(parameters, LUTsize, LUT, wavelet_yesno=1, percent = 1,
+invertProsail = function(parameters, measuredSpectra, LUTsize, obtainedLUT, wavelet_yesno=1, percent = 1,
   wavelet_no = 6, wavelet_range = c(1,200), printPlots = FALSE){
 
     LUTcost_vecorder = 1:LUTsize
+    spectra = measuredSpectra
 
     # LUTs generated
-    wavelet_LUT3 = LUT[[1]]
-    wavelet_LUT4 = LUT[[2]]
-    wavelet_LUT5 = LUT[[3]]
-    wavelet_LUT6 = LUT[[4]]
+    LUT = obtainedLUT$LUT
+    LUT_spectra = obtainedLUT$LUT_spectra
+    wavelet_LUT3 = obtainedLUT$wavelet_LUT3
+    wavelet_LUT4 = obtainedLUT$wavelet_LUT4
+    wavelet_LUT5 = obtainedLUT$wavelet_LUT5
+    wavelet_LUT6 = obtainedLUT$wavelet_LUT6
 
     # cost function
     estimates_traits   = matrix(NA, nrow=nrow(spectra), ncol=length(parameters))
@@ -145,12 +149,12 @@ invertProsail = function(parameters, LUTsize, LUT, wavelet_yesno=1, percent = 1,
 
       if (printPlots ==TRUE) {
 
-      png(file = paste("inverted_spectra/inversion_PD_",i,".png",sep=""),width = 400,units="px", height = 400, res = 80,bg = "white")
-      plot(minband:maxband,as.numeric(spectra[i,]), xlab="wavelength [nm]", ylab="reflectance [%]",
-           col="red", type="l", ylim=c(0,1), main=paste("pot: ",rownames(spectra)[i],"  RMSE: ",round(estimates_meanRMSE[i],3), sep=""))
-      lines(minband:maxband,estimates_spectra[i,], col="black")
-      grid()
-      dev.off()
+          png(file = paste("inverted_spectra/inversion_PD_",i,".png",sep=""),width = 400,units="px", height = 400, res = 80,bg = "white")
+          plot(minband:maxband,as.numeric(spectra[i,]), xlab="wavelength [nm]", ylab="reflectance [%]",
+               col="red", type="l", ylim=c(0,1), main=paste("pot: ",rownames(spectra)[i],"  RMSE: ",round(estimates_meanRMSE[i],3), sep=""))
+          lines(minband:maxband,estimates_spectra[i,], col="black")
+          grid()
+          dev.off()
       }
 
       setTxtProgressBar(pb, i)
@@ -159,7 +163,13 @@ invertProsail = function(parameters, LUTsize, LUT, wavelet_yesno=1, percent = 1,
     close(pb) # close progress bar conection
 
     colnames(estimates_traits) = c("N", "Cab", "Car", "Anth", "CW", "Cm", "Cbrown")
+    colnames(estimates_sd) = c("N", "Cab", "Car", "Anth", "CW", "Cm", "Cbrown")
     rownames(estimates_traits) = rownames(spectra)
+    rownames(estimates_sd) = rownames(spectra)
 
-    return(estimates_traits)
+    out = list(estimates_traits=estimates_traits,
+                estimates_sd=estimates_sd,
+                estimates_meanRMSE=estimates_meanRMSE,
+                estimates_spectra=estimates_spectra)
+    return(out)
 }

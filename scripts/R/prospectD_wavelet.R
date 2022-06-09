@@ -88,13 +88,18 @@ parameters[[7]] = Cbrown_minmax
 #: generate LUT
 ################################################
 # list containing the spectra generated using the wavelet transform for scales=3,4,5,6
-LUT1 = getProsailLUT(parameters=parameters, LUTsize=1000)
-LUT1
+LUT1 = getProsailLUT(parameters=parameters, LUTsize=LUTsize)
+names(LUT1)
+
 
 # get inverted traits                                           
 ################################################
-estimates_traits = invertProsail(parameters, LUT=LUT1, LUTsize=1000, percent = 1)                                       
-                                           
+inversion = invertProsail(parameters, obtainedLUT=LUT1, measuredSpectra=spectra,
+                                 LUTsize=LUTsize, percent = 1)                                       
+names(inversion)                                          
+inversion$estimates_
+
+
 ################################################
 #: export results
 ################################################
